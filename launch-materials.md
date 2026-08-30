@@ -77,5 +77,8 @@ business-lift claim. It is designed to make controls inspectable.
 - Review diagram labels against the implemented code and readiness ledger.
 - Confirm repository visibility, Pages settings, branch protection, topics,
   license, and private vulnerability reporting.
+- Keep the Pages job gated while the repository is private; after publication
+  approval, make the repository public and enable GitHub Actions as the Pages
+  source before the first deployment.
 - Test the static site at its subpath and with the API unavailable.
 - Review accessibility, ethics, security, and announcement copy.

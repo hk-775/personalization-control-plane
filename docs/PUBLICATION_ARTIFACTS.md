@@ -44,6 +44,11 @@ telemetry, remote fonts, third-party scripts, or network API dependency. The
 dashboard falls back to fictional read-only data when the FastAPI service is
 absent.
 
+The deployment job remains skipped while the repository is private. After
+external publication approval, make the repository public, enable Pages with
+GitHub Actions as its source, and run the workflow manually or update `site/`
+on `main`.
+
 ## Validation
 
 Before publication:
