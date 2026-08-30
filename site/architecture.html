@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Interactive architecture for the Personalization Control Plane recommendation, experiment, guardrail, approval, and audit flows.">
+    <meta name="theme-color" content="#f6f8f3">
+    <title>Architecture · Personalization Control Plane</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f7a5a'/%3E%3Cpath d='M8 20c4-8 12-8 16 0M10 13h12' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="assets/site.js" defer></script>
+    <script src="assets/architecture.js" defer></script>
+  </head>
+  <body class="architecture-body">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <div class="container site-nav__inner">
+        <a class="brand" href="./">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 17c3.4-6.7 10.6-6.7 14 0M7 9.5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="brand__text"><span>Personalization</span> Control Plane</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <div class="nav-links">
+          <a href="./">Product</a>
+          <a href="#flows">Flow explorer</a>
+          <a href="#layers">Layers</a>
+          <a href="./dashboard.html" class="button">Open dashboard <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </nav>
+
+    <main id="main">
+      <section class="arch-hero">
+        <div class="container arch-hero__grid">
+          <div>
+            <p class="eyebrow">Interactive system map</p>
+            <h1>One governed decision loop.</h1>
+          </div>
+          <aside class="arch-hero__aside">
+            <strong>Architecture promise</strong>
+            <p>
+              The same service owns policy state, runtime decisions, events,
+              guardrail actions, approvals, and evidence. Click a flow to trace it.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="flows">
+        <div class="container">
+          <div class="flow-selector" role="tablist" aria-label="Architecture flows">
+            <button type="button" class="is-active" data-flow="rank" role="tab">Rank request</button>
+            <button type="button" data-flow="launch" role="tab">Risky experiment launch</button>
+            <button type="button" data-flow="breach" role="tab">Guardrail breach</button>
+            <button type="button" data-flow="outcome" role="tab">Outcome feedback</button>
+          </div>
+
+          <div class="architecture-canvas" id="architecture-canvas">
+            <span class="arch-packet" id="arch-packet" aria-hidden="true"></span>
+            <div class="arch-lanes">
+              <div class="arch-lane-label">Request and decision plane</div>
+              <article class="arch-node" data-node="client">
+                <div class="arch-node__top"><span class="arch-node__code">01</span><span class="arch-node__badge">Ingress</span></div>
+                <div><strong>Product client</strong><small>Pseudonymous subject + normalized candidates</small></div>
+              </article>
+              <article class="arch-node" data-node="consent">
+                <div class="arch-node__top"><span class="arch-node__code">02</span><span class="arch-node__badge">Gate</span></div>
+                <div><strong>Consent &amp; purpose</strong><small>Reject absent consent, scope drift, sensitive keys</small></div>
+              </article>
+              <article class="arch-node" data-node="allocation">
+                <div class="arch-node__top"><span class="arch-node__code">03</span><span class="arch-node__badge">Control</span></div>
+                <div><strong>Policy + allocation</strong><small>Cohort floor, kill switch, stable bucket</small></div>
+              </article>
+              <article class="arch-node no-arrow" data-node="scorer">
+                <div class="arch-node__top"><span class="arch-node__code">04</span><span class="arch-node__badge">Decision</span></div>
+                <div><strong>Bounded scorer</strong><small>Weighted objectives, safety exclusion, explanation</small></div>
+              </article>
+
+              <div class="arch-lane-label">Control and governance plane</div>
+              <article class="arch-node" data-node="policy">
+                <div class="arch-node__top"><span class="arch-node__code">05</span><span class="arch-node__badge">Config</span></div>
+                <div><strong>Policy registry</strong><small>Immutable active versions + explicit purpose</small></div>
+              </article>
+              <article class="arch-node" data-node="experiment">
+                <div class="arch-node__top"><span class="arch-node__code">06</span><span class="arch-node__badge">Lifecycle</span></div>
+                <div><strong>Experiment service</strong><small>Draft, review, approval, running, rollback</small></div>
+              </article>
+              <article class="arch-node" data-node="approval">
+                <div class="arch-node__top"><span class="arch-node__code">07</span><span class="arch-node__badge">Human</span></div>
+                <div><strong>Approval queue</strong><small>Named decision for high-risk launches</small></div>
+              </article>
+              <article class="arch-node no-arrow" data-node="guardrail">
+                <div class="arch-node__top"><span class="arch-node__code">08</span><span class="arch-node__badge">Monitor</span></div>
+                <div><strong>Guardrail engine</strong><small>Quality, harm, complaints, fairness</small></div>
+              </article>
+
+              <div class="arch-lane-label">Evidence and learning plane</div>
+              <article class="arch-node" data-node="exposure">
+                <div class="arch-node__top"><span class="arch-node__code">09</span><span class="arch-node__badge">Event</span></div>
+                <div><strong>Exposure log</strong><small>Decision-bound, purpose-bound, idempotent</small></div>
+              </article>
+              <article class="arch-node" data-node="outcome">
+                <div class="arch-node__top"><span class="arch-node__code">10</span><span class="arch-node__badge">Event</span></div>
+                <div><strong>Outcome log</strong><small>Allowlisted outcomes linked to exposures</small></div>
+              </article>
+              <article class="arch-node" data-node="metrics">
+                <div class="arch-node__top"><span class="arch-node__code">11</span><span class="arch-node__badge">Aggregate</span></div>
+                <div><strong>Metric evaluator</strong><small>Suppress samples below the cohort floor</small></div>
+              </article>
+              <article class="arch-node no-arrow" data-node="audit">
+                <div class="arch-node__top"><span class="arch-node__code">12</span><span class="arch-node__badge">Evidence</span></div>
+                <div><strong>Audit hash chain</strong><small>Canonical records linked with SHA-256</small></div>
+              </article>
+            </div>
+
+            <div class="flow-inspector" aria-live="polite">
+              <span class="flow-inspector__progress" id="flow-progress">STEP 01 / 06</span>
+              <div>
+                <strong id="flow-title">Product client submits a bounded rank request</strong>
+                <p id="flow-description">The API accepts a pseudonymous subject, exact purpose, cohort, and normalized candidate features.</p>
+              </div>
+              <button type="button" class="button button--secondary button--small" id="flow-toggle">Pause animation</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="layers">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Implementation layers</p>
+              <h2>Compact enough to inspect. Complete enough to exercise.</h2>
+            </div>
+            <p>
+              FastAPI provides the typed HTTP surface, a service layer owns all
+              decisions and transitions, and SQLite retains a fully seeded local state.
+            </p>
+          </div>
+          <div class="arch-detail-grid">
+            <article class="arch-detail-card">
+              <span>01 / API</span>
+              <h3>Typed ingress</h3>
+              <p>Strict request models reject unknown fields and normalized values outside contract.</p>
+              <ul><li>Health and portfolio</li><li>Policies and experiments</li><li>Ranking and events</li><li>Metrics and guardrails</li></ul>
+            </article>
+            <article class="arch-detail-card">
+              <span>02 / SERVICE</span>
+              <h3>Canonical behavior</h3>
+              <p>One application service owns governance checks, deterministic choices, lifecycle transitions, and rollback.</p>
+              <ul><li>Purpose alignment</li><li>Risk classification</li><li>Stable allocation</li><li>Human approval gates</li></ul>
+            </article>
+            <article class="arch-detail-card">
+              <span>03 / STATE</span>
+              <h3>Portable local evidence</h3>
+              <p>SQLite stores policy versions, cohorts, experiments, approvals, decisions, events, metrics, and audit.</p>
+              <ul><li>No external services</li><li>Idempotent event keys</li><li>Resettable demo seed</li><li>Hash-chain verification</li></ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--surface">
+        <div class="container">
+          <div class="limitations">
+            <h2>Deployment boundary</h2>
+            <ul>
+              <li>The local SQLite topology is not horizontally scalable.</li>
+              <li>Authentication and role enforcement are not included in the demo.</li>
+              <li>Candidate features are supplied, not learned or independently verified.</li>
+              <li>Fairness parity is a diagnostic, not proof of equitable impact.</li>
+              <li>Audit hashing detects mutation; it is not external notarization.</li>
+              <li>Production use requires domain-specific review and monitoring.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <span>Personalization Control Plane · interactive reference architecture</span>
+        <div class="footer__links">
+          <a href="./">Product</a>
+          <a href="./dashboard.html">Dashboard</a>
+          <a href="/api/docs">OpenAPI</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

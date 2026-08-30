@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Operator dashboard for the seeded Personalization Control Plane demo.">
+    <meta name="theme-color" content="#f2f5f0">
+    <title>Operator Dashboard · Personalization Control Plane</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f7a5a'/%3E%3Cpath d='M8 20c4-8 12-8 16 0M10 13h12' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="assets/static-data.js"></script>
+    <script src="assets/dashboard.js" defer></script>
+  </head>
+  <body class="dashboard-body">
+    <a class="skip-link" href="#dashboard-content">Skip to dashboard content</a>
+    <div class="dashboard-shell">
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="./">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 17c3.4-6.7 10.6-6.7 14 0M7 9.5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="brand__text"><span>Personalization</span><br>Control Plane</span>
+        </a>
+
+        <span class="sidebar__label">Portfolio</span>
+        <nav class="dashboard-nav" aria-label="Dashboard views">
+          <button type="button" class="is-active" data-view="overview"><span class="nav-icon">OV</span>Overview</button>
+          <button type="button" data-view="experiments"><span class="nav-icon">EX</span>Experiments</button>
+          <button type="button" data-view="policies"><span class="nav-icon">PL</span>Recommendation policies</button>
+          <button type="button" data-view="cohorts"><span class="nav-icon">CO</span>Segments &amp; cohorts</button>
+          <button type="button" data-view="metrics"><span class="nav-icon">MT</span>Metrics</button>
+        </nav>
+
+        <span class="sidebar__label">Governance</span>
+        <nav class="dashboard-nav" aria-label="Governance views">
+          <button type="button" data-view="guardrails"><span class="nav-icon">GR</span>Guardrails &amp; fairness</button>
+          <button type="button" data-view="approvals"><span class="nav-icon">AU</span>Approvals &amp; audit</button>
+          <button type="button" data-view="demo"><span class="nav-icon">▶</span>Guided demo</button>
+        </nav>
+
+        <div class="sidebar__footer">
+          <strong>Local evaluation profile</strong>
+          <p>Fictional data · SQLite · no credentials · no network integrations</p>
+        </div>
+      </aside>
+
+      <main class="dashboard-main">
+        <header class="dashboard-topbar">
+          <div class="topbar__title">
+            <button class="mobile-dashboard-toggle" id="mobile-dashboard-toggle" type="button" aria-label="Toggle dashboard navigation">☰</button>
+            <div>
+              <h1 id="current-view-title">Portfolio overview</h1>
+              <span>Seeded control plane / evaluation workspace</span>
+            </div>
+          </div>
+          <div class="topbar__actions">
+            <span class="health-chip" id="health-chip">connecting</span>
+            <button class="button button--secondary button--small" id="kill-switch-button" type="button"><span>Kill switch:</span> inactive</button>
+            <button class="button button--secondary button--small" id="reset-button" type="button">Reset demo</button>
+          </div>
+        </header>
+
+        <div class="dashboard-content" id="dashboard-content">
+          <section class="dashboard-view is-active" data-view-panel="overview">
+            <div class="view-head">
+              <div>
+                <h2>Portfolio overview</h2>
+                <p>A cross-domain view of live experiments, governed policy versions, privacy-bounded metrics, approvals, and evidence.</p>
+              </div>
+              <a class="button button--secondary button--small" href="./architecture.html">Trace architecture</a>
+            </div>
+            <div class="metric-grid" id="overview-metrics">
+              <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+            </div>
+            <div class="dashboard-grid">
+              <div class="panel">
+                <div class="panel__head"><div><h3>Domain portfolio</h3><p>Fictional products using one governance model</p></div></div>
+                <div class="domain-list" id="overview-domains"><div class="skeleton"></div></div>
+              </div>
+              <div class="panel">
+                <div class="panel__head"><div><h3>System posture</h3><p>Hard controls currently enforced</p></div></div>
+                <div class="control-list" id="overview-controls"><div class="skeleton"></div></div>
+              </div>
+            </div>
+            <div class="dashboard-grid">
+              <div class="panel panel--flush">
+                <div class="panel__head panel-heading-pad"><div><h3>Experiment portfolio</h3><p>Lifecycle state and bounded traffic</p></div></div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead><tr><th>Experiment</th><th>Domain</th><th>State</th><th>Traffic</th><th>Risk</th></tr></thead>
+                    <tbody id="overview-experiments"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel__head"><div><h3>Recent evidence</h3><p>Newest hash-chained audit actions</p></div></div>
+                <div class="activity-list" id="overview-activity"><div class="skeleton"></div></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-view" data-view-panel="experiments">
+            <div class="view-head">
+              <div>
+                <h2>Experiment lifecycle</h2>
+                <p>Advance only through valid states. Risky launches pause for human approval; failed guardrails terminate treatment serving.</p>
+              </div>
+              <span class="state state--running" id="running-traffic-chip">loading traffic</span>
+            </div>
+            <div class="panel panel--flush">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Experiment</th><th>Cohort</th><th>Policies</th><th>Allocation</th><th>Risk / guardrail</th><th>State</th><th>Action</th></tr>
+                  </thead>
+                  <tbody id="experiments-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-view" data-view-panel="policies">
+            <div class="view-head">
+              <div>
+                <h2>Recommendation policies</h2>
+                <p>Immutable active versions define purpose, bounded objectives, normalized feature contracts, exploration, and candidate safety floors.</p>
+              </div>
+              <span class="state state--active">dark-pattern objectives prohibited</span>
+            </div>
+            <div class="policy-grid" id="policies-grid"><div class="skeleton"></div></div>
+          </section>
+
+          <section class="dashboard-view" data-view-panel="cohorts">
+            <div class="view-head">
+              <div>
+                <h2>Segments &amp; cohorts</h2>
+                <p>Only purpose-scoped, non-sensitive operational cohorts are seeded. Samples under the privacy floor cannot launch or reveal metrics.</p>
+              </div>
+              <span class="state state--eligible">minimum n = 50</span>
+            </div>
+            <div class="panel panel--flush">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Cohort</th><th>Domain</th><th>Approved purpose</th><th>Estimated size</th><th>Experiment use</th><th>Metric visibility</th></tr></thead>
+                  <tbody id="cohorts-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-view" data-view-panel="metrics">
+            <div class="view-head">
+              <div>
+                <h2>Privacy-bounded metrics</h2>
+                <p>Values are returned only when sample size meets the minimum cohort floor. Suppressed rows prove the API does not leak unstable small-cell values.</p>
+              </div>
+              <span class="state state--suppressed" id="suppressed-count">loading suppression</span>
+            </div>
+            <div class="panel panel--flush">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Experiment</th><th>Metric</th><th>Variant</th><th>Sample</th><th>Value</th><th>Privacy</th><th>Observed</th></tr></thead>
+                  <tbody id="metrics-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-view" data-view-panel="guardrails">
+            <div class="view-head">
+              <div>
+                <h2>Guardrails &amp; fairness</h2>
+                <p>Quality, harm, complaints, and parity are hard launch and runtime constraints—not optional annotations.</p>
+              </div>
+              <button class="button button--warning button--small" id="run-breach-button" type="button">Run rollback scenario</button>
+            </div>
+            <div class="governance-grid">
+              <article class="governance-card">
+                <span class="state state--passed">enforced</span>
+                <strong>Quality floor</strong>
+                <p>Each experiment defines a minimum aggregate quality score. A breach terminates a running treatment.</p>
+                <div class="guardrail-meter"><span style="width: 74%"></span></div>
+              </article>
+              <article class="governance-card">
+                <span class="state state--passed">enforced</span>
+                <strong>Harm &amp; complaint ceilings</strong>
+                <p>Normalized harm and complaint rates have explicit maximums, validated before launch and during evaluation.</p>
+                <div class="guardrail-meter"><span style="width: 28%"></span></div>
+              </article>
+              <article class="governance-card">
+                <span class="state state--passed">enforced</span>
+                <strong>Fairness ratio</strong>
+                <p>Opaque aggregate groups must each meet n ≥ 50. The worst-to-best positive-rate ratio cannot fall below 0.80.</p>
+                <div class="guardrail-meter"><span style="width: 84%"></span></div>
+              </article>
+              <article class="governance-card">
+                <span class="state state--passed">prohibited</span>
+                <strong>Sensitive scoring inputs</strong>
+                <p>Protected and sensitive keys are rejected recursively from policy features, context, candidate features, and metadata.</p>
+              </article>
+              <article class="governance-card">
+                <span class="state state--passed">capped</span>
+                <strong>Exploration</strong>
+                <p>Absolute exploration is capped at 10%. More than 3% makes a launch high risk and requires human approval.</p>
+              </article>
+              <article class="governance-card">
+                <span class="state state--passed">prohibited</span>
+                <strong>Manipulative objectives</strong>
+                <p>Compulsion, outrage, urgency, deceptive scarcity, and time-spent optimization terms fail policy validation.</p>
+              </article>
+            </div>
+            <div class="dashboard-grid">
+              <div class="panel">
+                <div class="panel__head"><div><h3>Latest guardrail evidence</h3><p>Visible aggregate metrics from active and historical experiments</p></div></div>
+                <div class="activity-list" id="guardrail-evidence"></div>
+              </div>
+              <div class="panel">
+                <div class="panel__head"><div><h3>Emergency control</h3><p>Pauses all running experiments; never auto-resumes</p></div></div>
+                <div id="kill-switch-panel"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-view" data-view-panel="approvals">
+            <div class="view-head">
+              <div>
+                <h2>Approvals &amp; audit</h2>
+                <p>High-risk launches require a named human decision. Every consequential action enters a locally verifiable SHA-256 hash chain.</p>
+              </div>
+              <span class="state state--passed" id="audit-verification">verifying chain</span>
+            </div>
+            <div class="panel panel--flush">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Request</th><th>Resource</th><th>Risk reasons</th><th>Requested by</th><th>Status</th><th>Decision</th></tr></thead>
+                  <tbody id="approvals-table"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="panel panel--flush panel-spaced">
+              <div class="panel__head panel-heading-pad"><div><h3>Audit chain</h3><p>Newest records first; hashes are shortened for display</p></div></div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Sequence</th><th>Time</th><th>Actor</th><th>Action</th><th>Resource</th><th>Record hash</th></tr></thead>
+                  <tbody id="audit-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-view" data-view-panel="demo">
+            <div class="view-head">
+              <div>
+                <h2>Guided meeting demo</h2>
+                <p>Each scenario calls the real local API and leaves inspectable state. Reset at any time to restore the canonical seed.</p>
+              </div>
+              <span class="state state--active">no external calls</span>
+            </div>
+            <div class="demo-grid">
+              <div class="panel">
+                <div class="panel__head"><div><h3>Choose a scenario</h3><p>Designed for a concise product walkthrough</p></div></div>
+                <div class="scenario-list" id="scenario-list"></div>
+              </div>
+              <div class="demo-stage" id="demo-stage">
+                <div class="demo-stage__empty">
+                  <div><strong>Ready for a governed walkthrough.</strong><p>Choose a scenario to exercise ranking, privacy suppression, approval, rollback, or the global safe fallback.</p></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  </body>
+</html>

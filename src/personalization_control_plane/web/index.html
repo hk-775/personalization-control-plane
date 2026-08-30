@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="An open-source control plane for governed recommendation policies, experiments, guardrails, approvals, and deterministic ranking.">
+    <meta name="theme-color" content="#f6f8f3">
+    <title>Personalization Control Plane</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f7a5a'/%3E%3Cpath d='M8 20c4-8 12-8 16 0M10 13h12' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="assets/site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <div class="container site-nav__inner">
+        <a class="brand" href="./">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 17c3.4-6.7 10.6-6.7 14 0M7 9.5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="brand__text"><span>Personalization</span> Control Plane</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <div class="nav-links">
+          <a href="#control-loop">Control loop</a>
+          <a href="#principles">Boundaries</a>
+          <a href="./architecture.html">Architecture</a>
+          <a href="./dashboard.html" class="button">Open seeded demo <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </nav>
+
+    <main id="main">
+      <section class="hero">
+        <div class="container hero__grid">
+          <div class="hero__copy reveal">
+            <p class="eyebrow">Open source · local first · auditable by design</p>
+            <h1>Optimize recommendations. <em>Not people.</em></h1>
+            <p class="hero__lede">
+              A neutral control plane for recommendation policies and experiments—with
+              deterministic allocation, multi-objective scoring, privacy floors, human
+              approvals, fairness guardrails, rollback, and explanations in the request path.
+            </p>
+            <div class="hero__actions">
+              <a class="button" href="./dashboard.html">Explore the operator demo <span aria-hidden="true">→</span></a>
+              <a class="button button--secondary" href="./architecture.html">Trace the architecture</a>
+            </div>
+            <ul class="hero__proof" aria-label="Product qualities">
+              <li>No credentials</li>
+              <li>No external calls</li>
+              <li>Fictional seeded data</li>
+              <li>MIT-0</li>
+            </ul>
+          </div>
+
+          <div class="control-preview reveal" aria-label="Product preview">
+            <div class="preview__bar">
+              <div class="preview__title"><span class="live-dot"></span> Governed decision path</div>
+              <span class="preview__status" id="service-status">checking local service…</span>
+            </div>
+            <div class="preview__metrics">
+              <div class="preview-metric">
+                <span>Traffic cap</span>
+                <strong>5%</strong>
+              </div>
+              <div class="preview-metric">
+                <span>Privacy floor</span>
+                <strong>50</strong>
+              </div>
+              <div class="preview-metric">
+                <span>Audit chain</span>
+                <strong>SHA-256</strong>
+              </div>
+            </div>
+            <div class="flow-stack">
+              <div class="flow-row">
+                <span class="flow-row__icon">01</span>
+                <span><strong>Consent + purpose gate</strong><small>Fail closed before candidate scoring</small></span>
+                <span class="status-pill">verified</span>
+              </div>
+              <div class="flow-row">
+                <span class="flow-row__icon">02</span>
+                <span><strong>Bounded policy allocation</strong><small>Stable assignment, capped exploration</small></span>
+                <span class="status-pill">4% traffic</span>
+              </div>
+              <div class="flow-row">
+                <span class="flow-row__icon">03</span>
+                <span><strong>Multi-objective ranker</strong><small>Quality, relevance, value, diversity, safety</small></span>
+                <span class="status-pill">explainable</span>
+              </div>
+              <div class="flow-row">
+                <span class="flow-row__icon">04</span>
+                <span><strong>Guardrail monitor</strong><small>Quality, harm, complaints, fairness</small></span>
+                <span class="status-pill status-pill--amber">watching</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="trust-bar">
+        <div class="container trust-bar__inner">
+          <strong>Enforced in code</strong>
+          <ul class="trust-list">
+            <li>Purpose limitation</li>
+            <li>Sensitive-feature rejection</li>
+            <li>Small-cohort suppression</li>
+            <li>Human launch approval</li>
+            <li>Automatic rollback</li>
+          </ul>
+        </div>
+      </div>
+
+      <section class="section" id="control-loop">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow">One inspectable loop</p>
+              <h2>From policy intent to accountable outcomes.</h2>
+            </div>
+            <p>
+              Operators define what “better” means, bound the blast radius, observe
+              outcomes, and retain the power to stop. The service makes each decision
+              reproducible instead of hiding it behind a black box.
+            </p>
+          </div>
+          <div class="loop-grid">
+            <article class="loop-card reveal">
+              <span class="loop-card__number">01 / DEFINE</span>
+              <h3>Version recommendation policy</h3>
+              <p>Declare an exact purpose, allowed normalized features, objective weights, exploration rate, and candidate safety floor.</p>
+              <span class="loop-card__line"></span>
+            </article>
+            <article class="loop-card reveal">
+              <span class="loop-card__number">02 / PROVE</span>
+              <h3>Review risk before launch</h3>
+              <p>Validate cohort size, policy scope, traffic limits, fairness thresholds, and whether a named human must approve.</p>
+              <span class="loop-card__line"></span>
+            </article>
+            <article class="loop-card reveal">
+              <span class="loop-card__number">03 / SERVE</span>
+              <h3>Rank with deterministic evidence</h3>
+              <p>Allocate traffic stably, score multiple bounded objectives, exclude unsafe candidates, and return factor-level explanations.</p>
+              <span class="loop-card__line"></span>
+            </article>
+            <article class="loop-card reveal">
+              <span class="loop-card__number">04 / RESPOND</span>
+              <h3>Measure, roll back, audit</h3>
+              <p>Link exposures to outcomes, suppress undersized metrics, trigger rollback on breaches, and verify the audit hash chain.</p>
+              <span class="loop-card__line"></span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--dark" id="principles">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow">Non-negotiable boundaries</p>
+              <h2>Safety is behavior, not a slide.</h2>
+            </div>
+            <p>
+              The demo refuses unsafe inputs and unsafe state transitions. These controls
+              are exercised by API tests and visible in the operator experience.
+            </p>
+          </div>
+          <div class="principle-grid">
+            <article class="principle-card reveal">
+              <span class="principle-card__icon">C</span>
+              <h3>Consent before personalization</h3>
+              <p>Ranking requests without affirmative consent return a refusal—never a silently personalized result.</p>
+            </article>
+            <article class="principle-card reveal">
+              <span class="principle-card__icon">P</span>
+              <h3>Exact purpose limitation</h3>
+              <p>Policy, cohort, exposure, and outcome purposes must match. Data cannot drift into a new optimization goal.</p>
+            </article>
+            <article class="principle-card reveal">
+              <span class="principle-card__icon">∅</span>
+              <h3>No sensitive scoring inputs</h3>
+              <p>Protected and sensitive attribute keys are rejected recursively from context, metadata, and feature contracts.</p>
+            </article>
+            <article class="principle-card reveal">
+              <span class="principle-card__icon">50</span>
+              <h3>Minimum cohort floor</h3>
+              <p>Small cohorts cannot launch experiments, and their metric values are suppressed from API responses.</p>
+            </article>
+            <article class="principle-card reveal">
+              <span class="principle-card__icon">H</span>
+              <h3>Human approval at risk</h3>
+              <p>High traffic, high exploration, or large objective shifts create a pending approval instead of launching.</p>
+            </article>
+            <article class="principle-card reveal">
+              <span class="principle-card__icon">↶</span>
+              <h3>Rollback and global stop</h3>
+              <p>Guardrail failures roll back live experiments. The kill switch pauses all experiments and serves approved baselines.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--surface">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow">Neutral by construction</p>
+              <h2>One control plane. Different recommendation domains.</h2>
+            </div>
+            <p>
+              The seed portfolio is entirely fictional and intentionally spans domains to
+              keep the product focused on governance mechanics rather than one industry.
+            </p>
+          </div>
+          <div class="domains">
+            <article class="domain-card reveal" style="--domain-accent: #dff2e8">
+              <span class="domain-card__label">Mercury Market / Commerce</span>
+              <h3>Durable user value over short-term conversion.</h3>
+              <p>A balanced product ranker tests more weight on quality and lasting value while protecting satisfaction and report rates.</p>
+              <div class="domain-card__meta"><span class="tag">4% traffic</span><span class="tag">running</span><span class="tag">quality floor</span></div>
+            </article>
+            <article class="domain-card reveal" style="--domain-accent: #e6f0f8">
+              <span class="domain-card__label">Northstar Media / Media</span>
+              <h3>Broader discovery without maximizing compulsion.</h3>
+              <p>A higher-exploration treatment remains blocked behind human approval because traffic and discovery movement are material.</p>
+              <div class="domain-card__meta"><span class="tag">12% proposed</span><span class="tag">approval required</span><span class="tag">trust</span></div>
+            </article>
+            <article class="domain-card reveal" style="--domain-accent: #fff2d7">
+              <span class="domain-card__label">CommonGround / Community</span>
+              <h3>Constructive participation with an immediate rollback path.</h3>
+              <p>A trust-forward policy is monitored against quality, complaints, harm, and parity—with a guided breach scenario ready.</p>
+              <div class="domain-card__meta"><span class="tag">3% traffic</span><span class="tag">fairness guardrail</span><span class="tag">kill switch</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container architecture-teaser">
+          <div class="architecture-teaser__copy reveal">
+            <p class="eyebrow">Interactive architecture</p>
+            <h2>Trace every consequential path.</h2>
+            <p>
+              Follow a rank request, high-risk launch, guardrail breach, or outcome signal
+              through the same SQLite-backed service. The architecture explorer animates
+              the exact gates, state, and audit records involved.
+            </p>
+            <a class="button button--secondary" href="./architecture.html">Open the flow explorer <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="mini-architecture reveal" aria-label="Architecture preview">
+            <div class="mini-node"><span>INGRESS</span><strong>Consent + purpose</strong></div>
+            <div class="mini-node"><span>CONTROL</span><strong>Policies + experiments</strong></div>
+            <div class="mini-node"><span>DECISION</span><strong>Deterministic scorer</strong></div>
+            <div class="mini-node"><span>EVENTS</span><strong>Exposure + outcome</strong></div>
+            <div class="mini-node"><span>GOVERNANCE</span><strong>Guardrails + approval</strong></div>
+            <div class="mini-node"><span>EVIDENCE</span><strong>Hash-chained audit</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--surface">
+        <div class="container">
+          <div class="limitations reveal">
+            <h2>Explicit demo limitations</h2>
+            <ul>
+              <li>Not a claim of production fairness or regulatory compliance.</li>
+              <li>No causal inference, learned model, or online feature store.</li>
+              <li>SQLite and a single process are evaluation defaults.</li>
+              <li>Authentication and organizational RBAC are deployment responsibilities.</li>
+              <li>Opaque aggregate group keys demonstrate parity mechanics only.</li>
+              <li>Production rollout still requires domain review and impact assessment.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="cta-panel reveal">
+            <div>
+              <h2>Start with the seeded portfolio.</h2>
+              <p>One local command brings up the landing page, real API, operator dashboard, guided scenarios, and interactive architecture.</p>
+            </div>
+            <a class="button" href="./dashboard.html">Open operator dashboard <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <span>Personalization Control Plane · fictional local demo · MIT-0</span>
+        <div class="footer__links">
+          <a href="./dashboard.html">Dashboard</a>
+          <a href="./architecture.html">Architecture</a>
+          <a href="/api/docs">OpenAPI</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
