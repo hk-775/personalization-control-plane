@@ -18,6 +18,10 @@ MIRRORED_FILES = (
     "assets/dashboard.js",
     "assets/architecture.js",
     "assets/static-data.js",
+    "assets/system-architecture.drawio",
+    "assets/system-architecture.png",
+    "assets/aws-reference-architecture.drawio",
+    "assets/aws-reference-architecture.png",
 )
 
 FORBIDDEN_DIRECTORIES = {
