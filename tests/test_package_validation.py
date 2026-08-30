@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
@@ -35,3 +36,56 @@ def test_validator_ignores_local_virtual_environment(tmp_path, monkeypatch) -> N
 
     validator.validate_tree()
     validator.validate_text()
+
+
+def test_public_architecture_artifacts_are_valid_and_mirrored() -> None:
+    root = Path(__file__).resolve().parents[1]
+    for stem in ("system-architecture", "aws-reference-architecture"):
+        site_drawio = root / "site" / "assets" / f"{stem}.drawio"
+        served_drawio = (
+            root
+            / "src"
+            / "personalization_control_plane"
+            / "web"
+            / "assets"
+            / f"{stem}.drawio"
+        )
+        site_png = root / "site" / "assets" / f"{stem}.png"
+        served_png = (
+            root
+            / "src"
+            / "personalization_control_plane"
+            / "web"
+            / "assets"
+            / f"{stem}.png"
+        )
+
+        assert ET.parse(site_drawio).getroot().tag == "mxfile"
+        assert site_drawio.read_bytes() == served_drawio.read_bytes()
+        assert site_png.read_bytes() == served_png.read_bytes()
+        png = site_png.read_bytes()
+        assert png[:8] == b"\x89PNG\r\n\x1a\n"
+        assert png[12:16] == b"IHDR"
+        assert int.from_bytes(png[16:20], "big") >= 1600
+        assert int.from_bytes(png[20:24], "big") >= 800
+
+
+def test_publication_documents_and_pages_workflow_exist() -> None:
+    root = Path(__file__).resolve().parents[1]
+    required = (
+        "STARTUP.md",
+        "launch-materials.md",
+        "docs/PRODUCTION_READINESS.md",
+        "docs/PUBLICATION_ARTIFACTS.md",
+        "docs/THREAT_MODEL.md",
+        ".github/workflows/pages.yml",
+    )
+    for relative in required:
+        assert (root / relative).is_file()
+
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    architecture = (root / "site" / "architecture.html").read_text(encoding="utf-8")
+    for name in ("system-architecture", "aws-reference-architecture"):
+        assert f"site/assets/{name}.png" in readme
+        assert f"assets/{name}.drawio" in architecture
+        assert f"assets/{name}.png" in architecture

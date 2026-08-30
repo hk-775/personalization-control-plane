@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Added
+
+- Editable and rendered current-system and AWS reference architecture diagrams.
+- Evaluator startup, threat model, production-readiness ledger, publication
+  inventory, and launch materials.
+- Downloadable architecture artifacts in the packaged and static sites.
+- GitHub Pages publication workflow.
+
 ## [0.1.0] - 2026-08-30
 
 ### Added

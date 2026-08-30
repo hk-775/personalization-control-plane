@@ -1,5 +1,9 @@
 # Personalization Control Plane
 
+[![CI](https://github.com/hk-775/personalization-control-plane/actions/workflows/ci.yml/badge.svg)](https://github.com/hk-775/personalization-control-plane/actions/workflows/ci.yml)
+[![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab.svg)](pyproject.toml)
+
 **An open-source control plane for governed recommendation optimization and
 experimentation.**
 
@@ -12,6 +16,13 @@ human approval, roll back unsafe changes, and verify an audit trail.
 The package is a fully seeded local product demo. It needs no credentials and
 makes no external network calls at runtime. All organizations, people, cohorts,
 products, events, and metrics are fictional.
+
+[Project site](https://hk-775.github.io/personalization-control-plane/) ·
+[Operator dashboard](https://hk-775.github.io/personalization-control-plane/dashboard.html) ·
+[Architecture explorer](https://hk-775.github.io/personalization-control-plane/architecture.html) ·
+[Quickstart](QUICKSTART.md) ·
+[Startup guide](STARTUP.md) ·
+[Ethics](docs/ETHICS.md)
 
 ## Run the seeded demo
 
@@ -125,6 +136,11 @@ See [docs/API.md](docs/API.md) for the endpoint inventory and state contracts.
 
 ## Architecture
 
+![Personalization Control Plane current architecture](site/assets/system-architecture.png)
+
+Editable source:
+[current architecture draw.io](site/assets/system-architecture.drawio).
+
 ```text
 Product client
     |
@@ -158,6 +174,18 @@ exposures, outcomes, metrics, settings, and audit records.
 
 The implementation intentionally uses one service and SQLite so a reviewer can
 trace behavior end to end. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+### AWS reference deployment
+
+![Personalization Control Plane AWS reference deployment](site/assets/aws-reference-architecture.png)
+
+Editable source:
+[AWS reference draw.io](site/assets/aws-reference-architecture.drawio).
+
+This is a proposed production path using AWS WAF, CloudFront, S3, Cognito,
+IAM, API Gateway, an internal load balancer, ECS Fargate, SQS, Lambda, Aurora
+PostgreSQL, KMS, ECR, CloudWatch, X-Ray, CloudTrail, and SNS. Version 0.1
+provisions none of these resources.
 
 ## Repository map
 
@@ -204,6 +232,20 @@ production safety, fairness, legal compliance, or business impact.
 
 The complete boundary is in [docs/ETHICS.md](docs/ETHICS.md) and
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+Read [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md) for the
+readiness ledger and [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) for threats,
+controls, assumptions, and residual risks.
+
+## Publication artifacts
+
+- [Evaluator startup](STARTUP.md)
+- [Meeting demo](docs/DEMO.md)
+- [Architecture reference](docs/ARCHITECTURE.md)
+- [Production readiness](docs/PRODUCTION_READINESS.md)
+- [Threat model](docs/THREAT_MODEL.md)
+- [Publication inventory](docs/PUBLICATION_ARTIFACTS.md)
+- [Launch materials](launch-materials.md)
 
 ## License
 

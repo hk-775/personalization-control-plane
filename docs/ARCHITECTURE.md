@@ -1,5 +1,13 @@
 # Architecture
 
+Current architecture:
+[`../site/assets/system-architecture.png`](../site/assets/system-architecture.png)
+([draw.io source](../site/assets/system-architecture.drawio)).
+
+AWS reference deployment:
+[`../site/assets/aws-reference-architecture.png`](../site/assets/aws-reference-architecture.png)
+([draw.io source](../site/assets/aws-reference-architecture.drawio)).
+
 ## Product boundary
 
 Personalization Control Plane is a local-first reference implementation of a
@@ -17,6 +25,19 @@ recommendation and experiment control plane. One FastAPI process owns:
 - the landing page, dashboard, and architecture explorer.
 
 SQLite is the canonical local store. There are no runtime network dependencies.
+
+![Personalization Control Plane current architecture](../site/assets/system-architecture.png)
+
+## AWS reference deployment
+
+![Personalization Control Plane proposed AWS reference deployment](../site/assets/aws-reference-architecture.png)
+
+The AWS diagram is a future-state reference, not deployed infrastructure. It
+maps the production-readiness gaps to authenticated human and workload ingress,
+multi-AZ container serving, durable event processing, replicated transactional
+state, externally anchored audit evidence, and privacy-redacted operations.
+Authoritative consent, reviewed features, offline statistics, and impact review
+remain governed external systems.
 
 ## Component map
 

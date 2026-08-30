@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Interactive architecture for the Personalization Control Plane recommendation, experiment, guardrail, approval, and audit flows.">
     <meta name="theme-color" content="#f6f8f3">
+    <link rel="canonical" href="https://hk-775.github.io/personalization-control-plane/architecture.html">
     <title>Architecture · Personalization Control Plane</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f7a5a'/%3E%3Cpath d='M8 20c4-8 12-8 16 0M10 13h12' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="assets/styles.css">
@@ -47,6 +48,29 @@
               guardrail actions, approvals, and evidence. Click a flow to trace it.
             </p>
           </aside>
+        </div>
+      </section>
+
+      <section class="section architecture-artifact-section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Current implementation</p>
+              <h2>Local system and trust boundary.</h2>
+            </div>
+            <p>
+              The downloadable system map distinguishes implemented FastAPI and
+              SQLite behavior from identity, feature, event, and production
+              infrastructure that the demo does not provide.
+            </p>
+          </div>
+          <figure class="architecture-figure">
+            <img src="assets/system-architecture.png" width="1751" height="858" alt="Personalization Control Plane current architecture showing callers, local service components, SQLite evidence, and external systems that are not integrated">
+            <figcaption>
+              <a href="assets/system-architecture.drawio" download>Editable draw.io source</a>
+              · <a href="assets/system-architecture.png" download>Download PNG</a>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -161,6 +185,30 @@
               <ul><li>No external services</li><li>Idempotent event keys</li><li>Resettable demo seed</li><li>Hash-chain verification</li></ul>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section class="section architecture-artifact-section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">AWS reference deployment</p>
+              <h2>A proposed production path—not deployed infrastructure.</h2>
+            </div>
+            <p>
+              The reference view adds authenticated identity, multi-AZ serving,
+              durable events, replicated state, independent audit evidence, and
+              privacy-redacted operations while keeping consent and impact
+              review explicit.
+            </p>
+          </div>
+          <figure class="architecture-figure">
+            <img src="assets/aws-reference-architecture.png" width="1953" height="1067" alt="Proposed AWS reference deployment for Personalization Control Plane showing authenticated ingress, Fargate service tasks, durable events, Aurora, audit evidence, and operations">
+            <figcaption>
+              <a href="assets/aws-reference-architecture.drawio" download>Editable draw.io source</a>
+              · <a href="assets/aws-reference-architecture.png" download>Download PNG</a>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
