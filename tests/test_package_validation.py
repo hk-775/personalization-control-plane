@@ -79,6 +79,11 @@ def test_publication_documents_and_pages_workflow_exist() -> None:
         "docs/PUBLICATION_ARTIFACTS.md",
         "docs/THREAT_MODEL.md",
         ".github/workflows/pages.yml",
+        ".github/CODEOWNERS",
+        ".github/dependabot.yml",
+        "CITATION.cff",
+        "GOVERNANCE.md",
+        "SUPPORT.md",
     )
     for relative in required:
         assert (root / relative).is_file()
@@ -89,3 +94,20 @@ def test_publication_documents_and_pages_workflow_exist() -> None:
         assert f"site/assets/{name}.png" in readme
         assert f"assets/{name}.drawio" in architecture
         assert f"assets/{name}.png" in architecture
+
+
+def test_docker_deployment_uses_uv_lockfile() -> None:
+    root = Path(__file__).resolve().parents[1]
+    dockerfile = (root / "Dockerfile").read_text(encoding="utf-8")
+
+    assert "FROM python:3.12-alpine3.24@sha256:" in dockerfile
+    assert "COPY --from=ghcr.io/astral-sh/uv:0.10.7@sha256:" in dockerfile
+    assert "RUN apk upgrade --no-cache" in dockerfile
+    assert "COPY pyproject.toml uv.lock README.md LICENSE ./" in dockerfile
+    assert "uv sync --frozen --no-dev --no-editable" in dockerfile
+    assert "USER pcp" in dockerfile
+    assert '"uv", "run", "--frozen", "--no-dev", "--no-sync"' in dockerfile
+    assert "pip install" not in dockerfile
+
+    compose = (root / "docker-compose.yml").read_text(encoding="utf-8")
+    assert "${PCP_BIND_ADDRESS:-127.0.0.1}:${PCP_PORT:-8102}:8102" in compose

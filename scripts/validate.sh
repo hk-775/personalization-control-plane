@@ -9,6 +9,7 @@ export PYTEST_DEBUG_TEMPROOT="${PYTEST_DEBUG_TEMPROOT:-${TMPDIR:-/tmp}/personali
 mkdir -p "${PYTEST_DEBUG_TEMPROOT}"
 
 uv run --frozen --extra dev ruff check --no-cache src tests scripts
+uv run --frozen --extra dev bandit -q -r src scripts
 uv run --frozen --extra dev pytest tests -q --tb=short \
   --cov=personalization_control_plane \
   --cov-branch \

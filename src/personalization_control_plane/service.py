@@ -941,7 +941,11 @@ class ControlPlane:
 
     def ingest_exposure(self, request: ExposureEvent) -> dict[str, Any]:
         existing = self.db.get_exposure(request.event_id)
-        occurred_at = self._event_timestamp(request.occurred_at)
+        occurred_at = (
+            existing["occurred_at"]
+            if existing is not None and request.occurred_at is None
+            else self._event_timestamp(request.occurred_at)
+        )
         decision = self.db.get_decision(request.decision_id)
         if decision is None:
             raise ControlPlaneError(
@@ -1028,7 +1032,12 @@ class ControlPlane:
                 "purpose_limitation",
                 "Outcome purpose must match the exposure purpose.",
             )
-        occurred_at = self._event_timestamp(request.occurred_at)
+        existing = self.db.get_outcome(request.event_id)
+        occurred_at = (
+            existing["occurred_at"]
+            if existing is not None and request.occurred_at is None
+            else self._event_timestamp(request.occurred_at)
+        )
         event = {
             "event_id": request.event_id,
             "exposure_event_id": request.exposure_event_id,
@@ -1038,7 +1047,6 @@ class ControlPlane:
             "occurred_at": occurred_at,
             "recorded_at": utc_now(),
         }
-        existing = self.db.get_outcome(request.event_id)
         if existing is not None:
             comparable = {key: existing[key] for key in event if key != "recorded_at"}
             incoming = {key: event[key] for key in event if key != "recorded_at"}

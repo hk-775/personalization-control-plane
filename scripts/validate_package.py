@@ -128,12 +128,37 @@ def validate_standard_port() -> None:
             fail(f"standard port 8102 missing from {relative}")
 
 
+def validate_uv_deployment() -> None:
+    dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    required = (
+        "FROM python:3.12-alpine3.24@sha256:",
+        "COPY --from=ghcr.io/astral-sh/uv:0.10.7@sha256:",
+        "RUN apk upgrade --no-cache",
+        "COPY pyproject.toml uv.lock README.md LICENSE ./",
+        "uv sync --frozen --no-dev --no-editable",
+        "USER pcp",
+        '"uv", "run", "--frozen", "--no-dev", "--no-sync"',
+    )
+    for snippet in required:
+        if snippet not in dockerfile:
+            fail(f"Docker deployment is missing required uv configuration: {snippet}")
+    if "pip install" in dockerfile:
+        fail("Docker deployment must install through uv, not pip")
+    compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    if "${PCP_BIND_ADDRESS:-127.0.0.1}:${PCP_PORT:-8102}:8102" not in compose:
+        fail("Compose must bind the unauthenticated demo to loopback by default")
+
+
 def main() -> None:
     validate_mirror()
     validate_tree()
     validate_text()
     validate_standard_port()
-    print("Static mirror, repository hygiene, metadata, and port checks passed.")
+    validate_uv_deployment()
+    print(
+        "Static mirror, repository hygiene, metadata, port, and uv deployment "
+        "checks passed."
+    )
 
 
 if __name__ == "__main__":

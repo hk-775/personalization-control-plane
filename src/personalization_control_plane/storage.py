@@ -26,6 +26,57 @@ def canonical_json(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
+RESET_QUERIES = (
+    "DELETE FROM outcomes",
+    "DELETE FROM exposures",
+    "DELETE FROM decisions",
+    "DELETE FROM metrics",
+    "DELETE FROM approvals",
+    "DELETE FROM experiments",
+    "DELETE FROM cohorts",
+    "DELETE FROM policies",
+    "DELETE FROM settings",
+    "DELETE FROM audit_log",
+)
+COUNT_QUERIES = {
+    "policies": "SELECT COUNT(*) FROM policies",
+    "cohorts": "SELECT COUNT(*) FROM cohorts",
+    "experiments": "SELECT COUNT(*) FROM experiments",
+    "approvals": "SELECT COUNT(*) FROM approvals",
+    "decisions": "SELECT COUNT(*) FROM decisions",
+    "exposures": "SELECT COUNT(*) FROM exposures",
+    "outcomes": "SELECT COUNT(*) FROM outcomes",
+    "audit_log": "SELECT COUNT(*) FROM audit_log",
+}
+POLICY_UPDATE_QUERIES = {
+    "name": "UPDATE policies SET name = ? WHERE id = ?",
+    "objective_weights": "UPDATE policies SET objective_weights_json = ? WHERE id = ?",
+    "exploration_rate": "UPDATE policies SET exploration_rate = ? WHERE id = ?",
+    "allowed_candidate_features": (
+        "UPDATE policies SET allowed_candidate_features_json = ? WHERE id = ?"
+    ),
+    "constraints": "UPDATE policies SET constraints_json = ? WHERE id = ?",
+    "status": "UPDATE policies SET status = ? WHERE id = ?",
+    "updated_at": "UPDATE policies SET updated_at = ? WHERE id = ?",
+}
+EXPERIMENT_UPDATE_QUERIES = {
+    "status": "UPDATE experiments SET status = ? WHERE id = ?",
+    "risk_level": "UPDATE experiments SET risk_level = ? WHERE id = ?",
+    "risk_reasons": "UPDATE experiments SET risk_reasons_json = ? WHERE id = ?",
+    "guardrails": "UPDATE experiments SET guardrails_json = ? WHERE id = ?",
+    "updated_at": "UPDATE experiments SET updated_at = ? WHERE id = ?",
+    "started_at": "UPDATE experiments SET started_at = ? WHERE id = ?",
+    "ended_at": "UPDATE experiments SET ended_at = ? WHERE id = ?",
+    "rollback_reason": "UPDATE experiments SET rollback_reason = ? WHERE id = ?",
+}
+APPROVAL_UPDATE_QUERIES = {
+    "status": "UPDATE approvals SET status = ? WHERE id = ?",
+    "decided_by": "UPDATE approvals SET decided_by = ? WHERE id = ?",
+    "decided_at": "UPDATE approvals SET decided_at = ? WHERE id = ?",
+    "decision_reason": "UPDATE approvals SET decision_reason = ? WHERE id = ?",
+}
+
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY,
@@ -220,19 +271,8 @@ class Database:
             if existing is not None:
                 generation = int(json.loads(existing["value_json"])) + 1
 
-            for table in (
-                "outcomes",
-                "exposures",
-                "decisions",
-                "metrics",
-                "approvals",
-                "experiments",
-                "cohorts",
-                "policies",
-                "settings",
-                "audit_log",
-            ):
-                connection.execute(f"DELETE FROM {table}")
+            for query in RESET_QUERIES:
+                connection.execute(query)
             connection.execute(
                 "DELETE FROM sqlite_sequence WHERE name IN ('metrics', 'audit_log')"
             )
@@ -552,23 +592,18 @@ class Database:
             )
 
     def update_policy(self, policy_id: str, fields: dict[str, Any]) -> None:
-        json_fields = {
-            "objective_weights": "objective_weights_json",
-            "allowed_candidate_features": "allowed_candidate_features_json",
-            "constraints": "constraints_json",
-        }
-        assignments: list[str] = []
-        values: list[Any] = []
+        json_fields = {"objective_weights", "allowed_candidate_features", "constraints"}
+        updates: list[tuple[str, Any]] = []
         for key, value in fields.items():
-            column = json_fields.get(key, key)
-            assignments.append(f"{column} = ?")
-            values.append(canonical_json(value) if key in json_fields else value)
-        values.append(policy_id)
-        with self.transaction() as connection:
-            connection.execute(
-                f"UPDATE policies SET {', '.join(assignments)} WHERE id = ?",
-                values,
+            query = POLICY_UPDATE_QUERIES.get(key)
+            if query is None:
+                raise ValueError(f"unsupported policy update field: {key}")
+            updates.append(
+                (query, canonical_json(value) if key in json_fields else value)
             )
+        with self.transaction() as connection:
+            for query, value in updates:
+                connection.execute(query, (value, policy_id))
 
     def list_cohorts(self) -> list[dict[str, Any]]:
         with self.connect() as connection:
@@ -660,22 +695,18 @@ class Database:
             )
 
     def update_experiment(self, experiment_id: str, fields: dict[str, Any]) -> None:
-        json_fields = {
-            "risk_reasons": "risk_reasons_json",
-            "guardrails": "guardrails_json",
-        }
-        assignments: list[str] = []
-        values: list[Any] = []
+        json_fields = {"risk_reasons", "guardrails"}
+        updates: list[tuple[str, Any]] = []
         for key, value in fields.items():
-            column = json_fields.get(key, key)
-            assignments.append(f"{column} = ?")
-            values.append(canonical_json(value) if key in json_fields else value)
-        values.append(experiment_id)
-        with self.transaction() as connection:
-            connection.execute(
-                f"UPDATE experiments SET {', '.join(assignments)} WHERE id = ?",
-                values,
+            query = EXPERIMENT_UPDATE_QUERIES.get(key)
+            if query is None:
+                raise ValueError(f"unsupported experiment update field: {key}")
+            updates.append(
+                (query, canonical_json(value) if key in json_fields else value)
             )
+        with self.transaction() as connection:
+            for query, value in updates:
+                connection.execute(query, (value, experiment_id))
 
     def running_traffic_total(self, *, exclude_id: str | None = None) -> float:
         query = "SELECT COALESCE(SUM(traffic_percent), 0) FROM experiments WHERE status = 'running'"
@@ -768,13 +799,15 @@ class Database:
             )
 
     def update_approval(self, approval_id: str, fields: dict[str, Any]) -> None:
-        assignments = [f"{key} = ?" for key in fields]
-        values = [*fields.values(), approval_id]
+        updates: list[tuple[str, Any]] = []
+        for key, value in fields.items():
+            query = APPROVAL_UPDATE_QUERIES.get(key)
+            if query is None:
+                raise ValueError(f"unsupported approval update field: {key}")
+            updates.append((query, value))
         with self.transaction() as connection:
-            connection.execute(
-                f"UPDATE approvals SET {', '.join(assignments)} WHERE id = ?",
-                values,
-            )
+            for query, value in updates:
+                connection.execute(query, (value, approval_id))
 
     def insert_decision(self, decision: dict[str, Any]) -> None:
         with self.transaction() as connection:
@@ -913,17 +946,8 @@ class Database:
     def counts(self) -> dict[str, int]:
         with self.connect() as connection:
             return {
-                table: int(connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
-                for table in (
-                    "policies",
-                    "cohorts",
-                    "experiments",
-                    "approvals",
-                    "decisions",
-                    "exposures",
-                    "outcomes",
-                    "audit_log",
-                )
+                table: int(connection.execute(query).fetchone()[0])
+                for table, query in COUNT_QUERIES.items()
             }
 
     def append_audit(
