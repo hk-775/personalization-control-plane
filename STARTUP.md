@@ -48,15 +48,19 @@ canonical fictional portfolio.
 ```bash
 ./scripts/validate.sh
 ./scripts/smoke.sh
+node scripts/test_public_site.mjs
 ```
 
 Expected baseline:
 
-- 17 tests pass;
+- 21 tests pass;
 - branch coverage remains at or above 80%;
 - lint and package validation pass;
 - the static site matches the packaged browser files;
 - the smoke test exercises all three pages and a governed rank request.
+- the public browser test covers the Pages base path, architecture animation,
+  dashboard views, five synthetic scenarios, mobile layout, and prohibited
+  API or WebSocket traffic.
 
 ## Static backup
 
@@ -66,6 +70,9 @@ python3 -m http.server 8102 --directory site
 
 The static dashboard uses read-only fictional fallback data. State-changing
 controls require the FastAPI service.
+
+Append `?public-site=true` to the local URL to reproduce the exact published
+no-API mode.
 
 ## Reset and stop
 

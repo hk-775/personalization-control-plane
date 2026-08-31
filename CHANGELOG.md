@@ -11,16 +11,21 @@ All notable changes to this project are documented here.
   inventory, and launch materials.
 - Downloadable architecture artifacts in the packaged and static sites.
 - GitHub Pages publication workflow.
+- Chrome conformance coverage for the Pages base path, architecture animation,
+  dashboard views, guided scenarios, mobile layout, and prohibited network
+  traffic.
 
 ### Changed
 
 - Container deployment now installs the locked environment with pinned `uv`
   on a security-updated Alpine base and starts the service through
-  `uv run --no-sync`.
+  `uv run --locked --no-sync`.
 - CI uses immutable action revisions, runs the real Python 3.11/3.12 matrix,
   and audits source and locked runtime dependencies.
 - Automated dependency-update pull requests are disabled; vulnerability alerts
   remain enabled and maintainers apply reviewed updates manually.
+- Published pages now load fictional read-only data without probing the local
+  API, while the local FastAPI experience keeps live state-changing controls.
 - Event replays without a supplied timestamp retain the original event time.
 - Compose binds the unauthenticated demo to loopback by default.
 

@@ -74,6 +74,7 @@ business-lift claim. It is designed to make controls inspectable.
 ## Pre-publication checklist
 
 - Run validation and smoke tests from a clean checkout.
+- Run `node scripts/test_public_site.mjs` with Node.js 22 and Chrome/Chromium.
 - Review diagram labels against the implemented code and readiness ledger.
 - Confirm repository visibility, Pages settings, branch protection, topics,
   license, and private vulnerability reporting.
@@ -81,4 +82,5 @@ business-lift claim. It is designed to make controls inspectable.
   approval, make the repository public and enable GitHub Actions as the Pages
   source before the first deployment.
 - Test the static site at its subpath and with the API unavailable.
+- Confirm the published dashboard makes no API or WebSocket requests.
 - Review accessibility, ethics, security, and announcement copy.

@@ -5,7 +5,7 @@ Thank you for helping improve Personalization Control Plane.
 ## Development setup
 
 ```bash
-uv sync --extra dev
+uv sync --locked --extra dev
 ./scripts/test.sh
 ./scripts/validate.sh
 ```

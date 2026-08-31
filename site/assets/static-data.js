@@ -323,7 +323,7 @@ window.PCP_STATIC_SCENARIOS = {
     result: { cohort_size: 34, minimum_size: 50, metric_value: null, status: "suppressed" },
   },
   "approval-gate": {
-    title: "Human approval for a risky launch",
+    title: "Human approval for risky launches",
     talk_track: [
       "Traffic and exploration exceed autonomous thresholds.",
       "The treatment cannot launch until a named human approves.",
@@ -341,7 +341,7 @@ window.PCP_STATIC_SCENARIOS = {
     result: { experiment: "exp-community-trust", before: "running", after: "rolled_back", action: "static preview" },
   },
   "kill-switch": {
-    title: "Global kill switch",
+    title: "Global safe fallback",
     talk_track: [
       "All running experiments are paused.",
       "Ranking continues on an approved baseline policy.",

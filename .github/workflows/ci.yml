@@ -18,6 +18,8 @@ concurrency:
 
 jobs:
   test:
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -43,20 +45,20 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --python "${{ matrix.python-version }}" --frozen --extra dev
+        run: uv sync --python "${{ matrix.python-version }}" --locked --extra dev
 
       - name: Lint
-        run: uv run --frozen --extra dev ruff check --no-cache src tests scripts
+        run: uv run --locked --extra dev ruff check --no-cache src tests scripts
 
       - name: Test
         run: >-
-          uv run --frozen --extra dev pytest tests -q --tb=short
+          uv run --locked --extra dev pytest tests -q --tb=short
           --cov=personalization_control_plane
           --cov-branch
           --cov-report=term-missing
 
       - name: Validate package and static mirror
-        run: uv run --frozen --extra dev python scripts/validate_package.py
+        run: uv run --locked --extra dev python scripts/validate_package.py
 
       - name: Smoke test standard port
         env:
@@ -64,6 +66,8 @@ jobs:
         run: ./scripts/smoke.sh
 
   security:
+    env:
+      UV_PYTHON: "3.12"
     runs-on: ubuntu-24.04
     steps:
       - name: Check out source
@@ -85,21 +89,39 @@ jobs:
           save-cache: false
 
       - name: Install development security tools
-        run: uv sync --python "3.12" --frozen --extra dev
+        run: uv sync --python "3.12" --locked --extra dev
 
       - name: Static security analysis
-        run: uv run --frozen --extra dev bandit -q -r src scripts
+        run: uv run --locked --extra dev bandit -q -r src scripts
 
       - name: Export locked runtime dependencies
         run: >-
-          uv export --quiet --frozen --no-dev --no-emit-project
+          uv export --quiet --locked --no-dev --no-emit-project
           --format requirements-txt
           --output-file "${RUNNER_TEMP}/runtime-requirements.txt"
 
       - name: Audit locked runtime dependencies
         run: >-
-          uv run --frozen --extra dev pip-audit
+          uv run --locked --extra dev pip-audit
           --requirement "${RUNNER_TEMP}/runtime-requirements.txt"
           --progress-spinner off
           --no-deps
           --disable-pip
+
+  public-site:
+    name: Public site (Chrome)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      - name: Test canonical public artifacts
+        run: node scripts/test_public_site.mjs

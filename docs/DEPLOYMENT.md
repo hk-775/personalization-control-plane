@@ -34,16 +34,18 @@ Compose publishes host port `${PCP_PORT:-8102}` to container port `8102`,
 persists `/app/data` in a named volume, drops Linux capabilities, enables
 `no-new-privileges`, uses a read-only root filesystem, and health-checks the
 local API. The image copies pinned `uv`, creates its runtime environment with
-`uv sync --frozen --no-dev --no-editable`, and starts the already-synchronized
-environment with `uv run --no-sync`. Compose binds to
+`uv sync --locked --no-dev --no-editable`, and starts the already-synchronized
+environment with `uv run --locked --no-sync`. Compose binds to
 `${PCP_BIND_ADDRESS:-127.0.0.1}` so the unauthenticated demo is not exposed to
 the local network by default.
 
 ## Static site
 
 Publish the contents of `site/` through any static host. It has no external
-asset dependencies. The dashboard switches to read-only fictional data when
-the API is absent.
+asset dependencies. On GitHub Pages, the landing page and dashboard enter an
+explicit read-only synthetic mode before any request is made; they do not probe
+the FastAPI service, open a WebSocket, or contact cloud resources. Other static
+hosts fall back to the same fictional data when the API is absent.
 
 The static site is not an operator control plane; state-changing actions require
 the FastAPI service.

@@ -1,3 +1,9 @@
+const publishedStaticSite = (
+  window.location.hostname.endsWith(".github.io")
+  || new URLSearchParams(window.location.search).get("public-site") === "true"
+);
+document.documentElement.dataset.publicSite = String(publishedStaticSite);
+
 const state = {
   health: null,
   portfolio: null,
@@ -58,6 +64,12 @@ function stateBadge(value) {
 }
 
 async function api(path, options = {}) {
+  if (publishedStaticSite) {
+    const error = new Error("The published synthetic preview does not call the local API.");
+    error.code = "published_preview_read_only";
+    error.details = {};
+    throw error;
+  }
   const response = await fetch(path, {
     ...options,
     headers: {
@@ -108,7 +120,9 @@ document.querySelector("#mobile-dashboard-toggle").addEventListener("click", () 
 function renderTopbar() {
   const healthChip = document.querySelector("#health-chip");
   healthChip.textContent = state.staticMode
-    ? "static preview · read only"
+    ? publishedStaticSite
+      ? "published preview · read only"
+      : "static preview · read only"
     : state.health
       ? `${state.health.status} · audit ${state.health.audit_chain.valid ? "verified" : "failed"}`
       : "offline";
@@ -117,6 +131,15 @@ function renderTopbar() {
   button.innerHTML = `<span>Kill switch:</span> ${kill.enabled ? "ACTIVE" : "inactive"}`;
   button.classList.toggle("button--danger", Boolean(kill.enabled));
   button.classList.toggle("button--secondary", !kill.enabled);
+  button.disabled = state.staticMode;
+  button.title = state.staticMode
+    ? "Start the local service to operate the kill switch."
+    : "";
+  const resetButton = document.querySelector("#reset-button");
+  resetButton.disabled = state.staticMode;
+  resetButton.title = state.staticMode
+    ? "Start the local service to reset seeded state."
+    : "";
 }
 
 function renderOverview() {
@@ -329,12 +352,15 @@ function renderGuardrails() {
     })
     .join("");
   const kill = state.portfolio?.kill_switch || { enabled: false };
+  const killSwitchAction = state.staticMode
+    ? '<span class="state state--suppressed">read-only published preview</span>'
+    : `<button type="button" class="button button--small ${kill.enabled ? "button--secondary" : "button--danger"}" data-kill-toggle="${kill.enabled ? "false" : "true"}">${kill.enabled ? "Disable switch" : "Activate switch"}</button>`;
   document.querySelector("#kill-switch-panel").innerHTML = `
     <div class="kill-switch-card ${kill.enabled ? "is-active" : ""}">
       <span class="state state--${kill.enabled ? "failed" : "passed"}">${kill.enabled ? "active" : "inactive"}</span>
       <strong>${kill.enabled ? "Experimental serving is paused" : "Experimental serving is enabled"}</strong>
       <p>${escapeHtml(kill.reason || "Activating the switch pauses all running experiments and routes ranking to approved baselines.")}</p>
-      <button type="button" class="button button--small ${kill.enabled ? "button--secondary" : "button--danger"}" data-kill-toggle="${kill.enabled ? "false" : "true"}">${kill.enabled ? "Disable switch" : "Activate switch"}</button>
+      ${killSwitchAction}
     </div>`;
 }
 
@@ -396,7 +422,27 @@ function renderAll() {
   renderDemoManifest();
 }
 
+function loadStaticPortfolio({ quiet = false } = {}) {
+  if (!window.PCP_STATIC_STATE) return false;
+  const fallback = structuredClone(window.PCP_STATIC_STATE);
+  Object.assign(state, fallback, { staticMode: true });
+  renderAll();
+  if (!quiet && !publishedStaticSite) {
+    toast(
+      "Static portfolio preview",
+      "Start ./scripts/demo.sh on port 8102 to enable live mutations.",
+    );
+  }
+  return true;
+}
+
 async function loadAll({ quiet = false } = {}) {
+  if (publishedStaticSite) {
+    if (!loadStaticPortfolio({ quiet })) {
+      toast("Static data unavailable", "The published fictional dataset could not be loaded.", "error");
+    }
+    return;
+  }
   try {
     const [
       health,
@@ -433,13 +479,7 @@ async function loadAll({ quiet = false } = {}) {
     renderAll();
     if (!quiet) toast("Seeded control plane loaded", "All dashboard views are backed by the local API.");
   } catch (error) {
-    if (window.PCP_STATIC_STATE) {
-      const fallback = structuredClone(window.PCP_STATIC_STATE);
-      Object.assign(state, fallback, { staticMode: true });
-      renderAll();
-      toast("Static portfolio preview", "Start ./scripts/demo.sh on port 8102 to enable live mutations.");
-      return;
-    }
+    if (loadStaticPortfolio({ quiet })) return;
     toast("Could not load the control plane", `${error.code}: ${error.message}`, "error");
     document.querySelector("#health-chip").textContent = "API unavailable";
   }
@@ -552,7 +592,6 @@ async function runScenario(scenarioId) {
   document.querySelectorAll("[data-scenario]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.scenario === scenarioId);
   });
-  stage.innerHTML = `<div class="demo-stage__empty"><div><strong>Running scenario…</strong><p>The local API is applying real control-plane behavior.</p></div></div>`;
   if (state.staticMode && window.PCP_STATIC_SCENARIOS?.[scenarioId]) {
     const result = window.PCP_STATIC_SCENARIOS[scenarioId];
     stage.innerHTML = `
@@ -562,9 +601,12 @@ async function runScenario(scenarioId) {
         <ul class="talk-track">${(result.talk_track || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
         <pre class="json-view">${escapeHtml(JSON.stringify(result.result, null, 2))}</pre>
       </div>`;
-    toast("Static scenario preview", "Run the local service to execute the state change.");
+    if (!publishedStaticSite) {
+      toast("Static scenario preview", "Run the local service to execute the state change.");
+    }
     return;
   }
+  stage.innerHTML = `<div class="demo-stage__empty"><div><strong>Running scenario…</strong><p>The local API is applying real control-plane behavior.</p></div></div>`;
   try {
     const result = await api(`/api/v1/demo/scenarios/${encodeURIComponent(scenarioId)}`, {
       method: "POST",

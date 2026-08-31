@@ -79,6 +79,7 @@ def test_publication_documents_and_pages_workflow_exist() -> None:
         "docs/PUBLICATION_ARTIFACTS.md",
         "docs/THREAT_MODEL.md",
         ".github/workflows/pages.yml",
+        "scripts/test_public_site.mjs",
         ".github/CODEOWNERS",
         "CITATION.cff",
         "GOVERNANCE.md",
@@ -94,6 +95,15 @@ def test_publication_documents_and_pages_workflow_exist() -> None:
         assert f"assets/{name}.drawio" in architecture
         assert f"assets/{name}.png" in architecture
 
+    pages = (root / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
+    assert 'UV_PYTHON: "3.12"' in pages
+    assert "uv sync --python \"3.12\" --locked --extra dev" in pages
+    assert "node scripts/test_public_site.mjs" in pages
+
+    ci = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "UV_PYTHON: ${{ matrix.python-version }}" in ci
+    assert 'UV_PYTHON: "3.12"' in ci
+
 
 def test_docker_deployment_uses_uv_lockfile() -> None:
     root = Path(__file__).resolve().parents[1]
@@ -103,9 +113,9 @@ def test_docker_deployment_uses_uv_lockfile() -> None:
     assert "COPY --from=ghcr.io/astral-sh/uv:0.10.7@sha256:" in dockerfile
     assert "RUN apk upgrade --no-cache" in dockerfile
     assert "COPY pyproject.toml uv.lock README.md LICENSE ./" in dockerfile
-    assert "uv sync --frozen --no-dev --no-editable" in dockerfile
+    assert "uv sync --locked --no-dev --no-editable" in dockerfile
     assert "USER pcp" in dockerfile
-    assert '"uv", "run", "--frozen", "--no-dev", "--no-sync"' in dockerfile
+    assert '"uv", "run", "--locked", "--no-dev", "--no-sync"' in dockerfile
     assert "pip install" not in dockerfile
 
     compose = (root / "docker-compose.yml").read_text(encoding="utf-8")

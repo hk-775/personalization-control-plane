@@ -28,11 +28,11 @@ trap cleanup EXIT
 
 export PYTHONDONTWRITEBYTECODE=1
 
-uv run --frozen --extra dev pcp-demo \
+uv run --locked --extra dev pcp-demo \
   --host 127.0.0.1 \
   --port "${SMOKE_PORT}" \
   --db "${SMOKE_DB}" >"${SMOKE_LOG}" 2>&1 &
 SERVER_PID=$!
 
-PCP_PORT="${SMOKE_PORT}" uv run --frozen --extra dev python scripts/smoke.py
+PCP_PORT="${SMOKE_PORT}" uv run --locked --extra dev python scripts/smoke.py
 echo "Smoke test passed on http://127.0.0.1:${SMOKE_PORT}."
