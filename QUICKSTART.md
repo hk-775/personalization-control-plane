@@ -87,8 +87,9 @@ docker compose up --build
 
 The service is available at `http://127.0.0.1:8102` and stores the SQLite file
 in the named `pcp-data` volume. The image installs from `uv.lock` with pinned
-`uv` and starts the service through `uv run --no-sync`. Compose binds only to
-loopback unless `PCP_BIND_ADDRESS` is explicitly changed.
+`uv` through `uv sync --locked` and starts the service through
+`uv run --locked --no-sync`. Compose binds only to loopback unless
+`PCP_BIND_ADDRESS` is explicitly changed.
 
 Stop it:
 
@@ -126,3 +127,7 @@ python3 -m http.server 8102 --directory site
 ```
 
 Open `http://127.0.0.1:8102`.
+
+To exercise the exact read-only publication mode locally, open
+`http://127.0.0.1:8102/?public-site=true`. That mode loads fictional browser
+data directly and makes no API requests.

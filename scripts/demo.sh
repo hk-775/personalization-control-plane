@@ -14,7 +14,7 @@ export PCP_PORT="${PCP_PORT:-8102}"
 export PCP_DB_PATH="${PCP_DB_PATH:-data/personalization-control-plane.db}"
 export PYTHONDONTWRITEBYTECODE=1
 
-exec uv run --frozen --extra dev pcp-demo \
+exec uv run --locked --extra dev pcp-demo \
   --host "${PCP_HOST}" \
   --port "${PCP_PORT}" \
   --db "${PCP_DB_PATH}"

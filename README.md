@@ -50,9 +50,9 @@ Docker is also supported:
 docker compose up --build
 ```
 
-The image uses pinned `uv` and installs the locked runtime environment from
-`uv.lock`; deployment does not use a direct `pip install`. Compose binds the
-unauthenticated demo to `127.0.0.1` by default.
+The image uses pinned `uv`, installs with `uv sync --locked`, and starts with
+`uv run --locked --no-sync`; deployment does not use a direct `pip install`.
+Compose binds the unauthenticated demo to `127.0.0.1` by default.
 
 See [QUICKSTART.md](QUICKSTART.md) for a guided first run.
 
@@ -214,10 +214,14 @@ scripts/                 Demo, test, smoke, and package-validation commands
 ./scripts/test.sh
 ./scripts/smoke.sh
 ./scripts/validate.sh
+node scripts/test_public_site.mjs
 ```
 
 `validate.sh` checks Python lint, the full tests, shell syntax, package hygiene,
-the standard port, placeholder public URLs, and exact `site/` mirroring.
+the standard port, placeholder public URLs, locked `uv` deployment, and exact
+`site/` mirroring. The public-site test uses Node.js 22 and Chrome/Chromium to
+exercise the Pages subpath, architecture animation, every dashboard view, all
+five synthetic scenarios, mobile layout, and the no-API/no-WebSocket boundary.
 
 ## Important limitations
 

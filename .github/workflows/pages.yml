@@ -5,6 +5,11 @@ on:
     branches: [main]
     paths:
       - "site/**"
+      - "src/personalization_control_plane/web/**"
+      - "scripts/test_public_site.mjs"
+      - "scripts/validate_package.py"
+      - "pyproject.toml"
+      - "uv.lock"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -20,15 +25,44 @@ concurrency:
 jobs:
   deploy:
     if: ${{ github.event.repository.private == false }}
+    name: Publish canonical project site
+    env:
+      UV_PYTHON: "3.12"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.10.7"
+          python-version: "3.12"
+
+      - name: Validate locked Python environment
+        run: uv sync --python "3.12" --locked --extra dev
+
+      - name: Validate package and static mirror
+        run: uv run --locked --extra dev python scripts/validate_package.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      - name: Test canonical public artifacts in Chrome
+        run: node scripts/test_public_site.mjs
 
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0

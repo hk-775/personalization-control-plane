@@ -41,8 +41,10 @@ The four files exist under both the packaged web assets and `site/assets/`.
 
 The Pages workflow publishes only `site/`. It contains no credentials,
 telemetry, remote fonts, third-party scripts, or network API dependency. The
-dashboard falls back to fictional read-only data when the FastAPI service is
-absent.
+GitHub Pages host enters fictional read-only mode before any API call, and
+state-changing controls remain disabled. The workflow synchronizes the locked
+Python environment, validates the package mirror, and runs Chrome against the
+repository Pages base before upload.
 
 The deployment job remains skipped while the repository is private. After
 external publication approval, make the repository public, enable Pages with
@@ -56,10 +58,12 @@ Before publication:
 ```bash
 ./scripts/validate.sh
 ./scripts/smoke.sh
+node scripts/test_public_site.mjs
 ```
 
 Then serve `site/` locally and inspect `/`, `/dashboard.html`, and
-`/architecture.html` with scripts enabled and disabled.
+`/architecture.html` with scripts enabled and disabled. Use
+`?public-site=true` for the exact no-API publication behavior.
 
 ## Intentional omissions
 

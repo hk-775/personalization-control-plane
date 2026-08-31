@@ -20,7 +20,7 @@ RUN apk upgrade --no-cache \
 COPY pyproject.toml uv.lock README.md LICENSE ./
 COPY src ./src
 
-RUN uv sync --frozen --no-dev --no-editable \
+RUN uv sync --locked --no-dev --no-editable \
     && mkdir -p /app/data \
     && chown -R pcp:pcp /app
 
@@ -31,4 +31,4 @@ EXPOSE 8102
 HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
   CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8102/api/v1/health', timeout=2)"]
 
-CMD ["uv", "run", "--frozen", "--no-dev", "--no-sync", "pcp-demo", "--host", "0.0.0.0", "--port", "8102", "--db", "/app/data/personalization-control-plane.db"]
+CMD ["uv", "run", "--locked", "--no-dev", "--no-sync", "pcp-demo", "--host", "0.0.0.0", "--port", "8102", "--db", "/app/data/personalization-control-plane.db"]

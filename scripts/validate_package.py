@@ -91,6 +91,7 @@ def validate_text() -> None:
         ".js",
         ".json",
         ".md",
+        ".mjs",
         ".py",
         ".sh",
         ".toml",
@@ -135,9 +136,9 @@ def validate_uv_deployment() -> None:
         "COPY --from=ghcr.io/astral-sh/uv:0.10.7@sha256:",
         "RUN apk upgrade --no-cache",
         "COPY pyproject.toml uv.lock README.md LICENSE ./",
-        "uv sync --frozen --no-dev --no-editable",
+        "uv sync --locked --no-dev --no-editable",
         "USER pcp",
-        '"uv", "run", "--frozen", "--no-dev", "--no-sync"',
+        '"uv", "run", "--locked", "--no-dev", "--no-sync"',
     )
     for snippet in required:
         if snippet not in dockerfile:
@@ -149,12 +150,45 @@ def validate_uv_deployment() -> None:
         fail("Compose must bind the unauthenticated demo to loopback by default")
 
 
+def validate_publication_workflow() -> None:
+    browser_test = ROOT / "scripts" / "test_public_site.mjs"
+    if not browser_test.is_file():
+        fail("missing public-site browser test")
+    browser_text = browser_test.read_text(encoding="utf-8")
+    for snippet in (
+        'const publicBase = "/personalization-control-plane/";',
+        'cdp.on("Network.webSocketCreated"',
+        'document.documentElement.dataset.publicSite === "true"',
+    ):
+        if snippet not in browser_text:
+            fail(f"public-site browser test is missing required coverage: {snippet}")
+
+    pages = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
+    for snippet in (
+        'UV_PYTHON: "3.12"',
+        'uv sync --python "3.12" --locked --extra dev',
+        "uv run --locked --extra dev python scripts/validate_package.py",
+        "node scripts/test_public_site.mjs",
+    ):
+        if snippet not in pages:
+            fail(f"Pages workflow is missing required validation: {snippet}")
+
+    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    for snippet in (
+        "UV_PYTHON: ${{ matrix.python-version }}",
+        'UV_PYTHON: "3.12"',
+    ):
+        if snippet not in ci:
+            fail(f"CI does not preserve the selected Python interpreter: {snippet}")
+
+
 def main() -> None:
     validate_mirror()
     validate_tree()
     validate_text()
     validate_standard_port()
     validate_uv_deployment()
+    validate_publication_workflow()
     print(
         "Static mirror, repository hygiene, metadata, port, and uv deployment "
         "checks passed."
