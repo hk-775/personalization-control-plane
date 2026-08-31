@@ -82,6 +82,7 @@ jobs:
           version: "0.10.7"
           python-version: "3.12"
           enable-cache: true
+          save-cache: false
 
       - name: Install development security tools
         run: uv sync --python "3.12" --frozen --extra dev
