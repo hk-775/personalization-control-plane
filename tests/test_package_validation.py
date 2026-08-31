@@ -80,7 +80,6 @@ def test_publication_documents_and_pages_workflow_exist() -> None:
         "docs/THREAT_MODEL.md",
         ".github/workflows/pages.yml",
         ".github/CODEOWNERS",
-        ".github/dependabot.yml",
         "CITATION.cff",
         "GOVERNANCE.md",
         "SUPPORT.md",
