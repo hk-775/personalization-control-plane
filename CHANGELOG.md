@@ -19,6 +19,8 @@ All notable changes to this project are documented here.
   `uv run --no-sync`.
 - CI uses immutable action revisions, runs the real Python 3.11/3.12 matrix,
   and audits source and locked runtime dependencies.
+- Automated dependency-update pull requests are disabled; vulnerability alerts
+  remain enabled and maintainers apply reviewed updates manually.
 - Event replays without a supplied timestamp retain the original event time.
 - Compose binds the unauthenticated demo to loopback by default.
 
