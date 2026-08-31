@@ -50,6 +50,10 @@ Docker is also supported:
 docker compose up --build
 ```
 
+The image uses pinned `uv` and installs the locked runtime environment from
+`uv.lock`; deployment does not use a direct `pip install`. Compose binds the
+unauthenticated demo to `127.0.0.1` by default.
+
 See [QUICKSTART.md](QUICKSTART.md) for a guided first run.
 
 ## What is implemented

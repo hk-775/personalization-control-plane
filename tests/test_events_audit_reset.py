@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import pytest
+
 
 def test_exposure_outcome_idempotency_and_purpose(
     client,
     commerce_rank_payload: dict,
+    monkeypatch,
 ) -> None:
     rank = client.post(
         "/api/v1/recommendations/rank",
@@ -12,6 +15,15 @@ def test_exposure_outcome_idempotency_and_purpose(
     assert rank.status_code == 200
     decision = rank.json()
     candidate_id = decision["recommendations"][0]["candidate_id"]
+
+    timestamps = iter(
+        f"2026-08-31T00:00:{second:02d}Z"
+        for second in range(20)
+    )
+    monkeypatch.setattr(
+        "personalization_control_plane.service.utc_now",
+        lambda: next(timestamps),
+    )
 
     exposure_payload = {
         "event_id": "evt-exposure-001",
@@ -27,6 +39,7 @@ def test_exposure_outcome_idempotency_and_purpose(
     assert exposure.json()["idempotent_replay"] is False
     assert replay.status_code == 201
     assert replay.json()["idempotent_replay"] is True
+    assert replay.json()["occurred_at"] == exposure.json()["occurred_at"]
 
     conflict = client.post(
         "/api/v1/events/exposures",
@@ -54,6 +67,7 @@ def test_exposure_outcome_idempotency_and_purpose(
 
     assert outcome.status_code == 201
     assert outcome_replay.json()["idempotent_replay"] is True
+    assert outcome_replay.json()["occurred_at"] == outcome.json()["occurred_at"]
     assert prohibited.status_code == 422
     assert prohibited.json()["error"]["code"] == "outcome_type_not_allowed"
 
@@ -144,3 +158,13 @@ def test_api_pages_health_and_state_changes(client) -> None:
     portfolio = client.get("/api/v1/portfolio")
     assert portfolio.status_code == 200
     assert set(portfolio.json()["domains"]) == {"commerce", "community", "media"}
+
+
+def test_storage_rejects_unapproved_dynamic_update_columns(app) -> None:
+    database = app.state.control_plane.db
+    with pytest.raises(ValueError, match="unsupported policy update field"):
+        database.update_policy("policy-id", {"status = 'active' --": "active"})
+    with pytest.raises(ValueError, match="unsupported experiment update field"):
+        database.update_experiment("experiment-id", {"status = 'running' --": "running"})
+    with pytest.raises(ValueError, match="unsupported approval update field"):
+        database.update_approval("approval-id", {"status = 'approved' --": "approved"})

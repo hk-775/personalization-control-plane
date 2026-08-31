@@ -40,7 +40,7 @@ Status meanings:
 | Experiment statistics | Missing / Blocked | Deterministic synthetic metrics | Power, sequential tests, stopping rules, multiplicity controls |
 | Performance evidence | Missing | No load benchmark | Workload model, latency/error targets, capacity tests |
 | Accessibility | Partial | Semantic pages and keyboard-oriented controls | Manual assistive-technology audit |
-| Supply chain | Partial | Locked dependencies, CI, lint, tests | Signed releases, provenance attestations, image scanning |
+| Supply chain | Partial | Locked dependencies, immutable CI actions, source and dependency security checks, hardened pinned container base | Signed releases, provenance attestations, continuous image scanning |
 | Security assurance | Partial | Unit controls and hardened demo container | Threat-led testing, penetration test, independent review |
 | Legal and ethical review | Not claimed | Ethics guide and explicit exclusions | Domain-specific privacy, consumer, accessibility, and impact review |
 

@@ -8,7 +8,7 @@ services:
       PCP_DB_PATH: /app/data/personalization-control-plane.db
       PCP_LOG_LEVEL: info
     ports:
-      - "${PCP_PORT:-8102}:8102"
+      - "${PCP_BIND_ADDRESS:-127.0.0.1}:${PCP_PORT:-8102}:8102"
     volumes:
       - pcp-data:/app/data
     read_only: true

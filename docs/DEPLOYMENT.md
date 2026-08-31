@@ -19,6 +19,7 @@ Environment variables:
 | Variable | Default |
 |---|---|
 | `PCP_HOST` | `127.0.0.1` |
+| `PCP_BIND_ADDRESS` | `127.0.0.1` (Compose host binding) |
 | `PCP_PORT` | `8102` |
 | `PCP_DB_PATH` | `data/personalization-control-plane.db` |
 | `PCP_LOG_LEVEL` | `info` |
@@ -32,7 +33,11 @@ docker compose up --build
 Compose publishes host port `${PCP_PORT:-8102}` to container port `8102`,
 persists `/app/data` in a named volume, drops Linux capabilities, enables
 `no-new-privileges`, uses a read-only root filesystem, and health-checks the
-local API.
+local API. The image copies pinned `uv`, creates its runtime environment with
+`uv sync --frozen --no-dev --no-editable`, and starts the already-synchronized
+environment with `uv run --no-sync`. Compose binds to
+`${PCP_BIND_ADDRESS:-127.0.0.1}` so the unauthenticated demo is not exposed to
+the local network by default.
 
 ## Static site
 

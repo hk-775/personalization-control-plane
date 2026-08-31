@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using this metadata."
+title: "Personalization Control Plane"
+type: software
+authors:
+  - name: "Personalization Control Plane Contributors"
+repository-code: "https://github.com/hk-775/personalization-control-plane"
+license: MIT-0
+version: 0.1.0
+date-released: 2026-08-30

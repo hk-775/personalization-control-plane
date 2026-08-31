@@ -86,7 +86,9 @@ docker compose up --build
 ```
 
 The service is available at `http://127.0.0.1:8102` and stores the SQLite file
-in the named `pcp-data` volume.
+in the named `pcp-data` volume. The image installs from `uv.lock` with pinned
+`uv` and starts the service through `uv run --no-sync`. Compose binds only to
+loopback unless `PCP_BIND_ADDRESS` is explicitly changed.
 
 Stop it:
 

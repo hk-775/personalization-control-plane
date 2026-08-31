@@ -20,7 +20,11 @@ def request(path: str, payload: dict | None = None) -> tuple[int, bytes]:
         headers={"Content-Type": "application/json", "Accept": "application/json"},
         method="POST" if payload is not None else "GET",
     )
-    with urllib.request.urlopen(incoming, timeout=3) as response:
+    # Safe: the smoke test always targets this fixed numeric loopback URL.
+    with urllib.request.urlopen(  # nosec B310
+        incoming,
+        timeout=3,
+    ) as response:
         return response.status, response.read()
 
 
